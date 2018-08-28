@@ -1,8 +1,17 @@
 # -*- coding: utf8 -*-
-class BaseConfig(object):
-    pass
+from kombu import Connection
 
-class Develope(object):
+
+class BaseConfig(object):
+
+    @classmethod
+    def get_connection(cls):
+        connection = Connection(host=cls.Host, port=cls.Port, virtual_host=cls.VirtualHost, password=cls.PassWord,
+                                userid=cls.UserId)
+        return connection
+
+
+class Develope(BaseConfig):
     Host = 'localhost'
     Port = 5672
     VirtualHost = 'test'
@@ -10,5 +19,5 @@ class Develope(object):
     UserId = 'guest'
 
 
-config_dict = {"develop":Develope}
+config_dict = {"develop": Develope}
 config_use = config_dict.get('develop')

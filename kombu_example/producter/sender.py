@@ -1,7 +1,6 @@
 # -*- coding: utf8 -*-
 from kombu.pools import producers
-from kombu import Connection
-from kombu_example.producter.exchange import task_exchange
+
 
 priority_to_routing_key = {
     'high': 'hipri',
@@ -10,19 +9,24 @@ priority_to_routing_key = {
 }
 
 
-def send_as_task(connection,  args=(), kwargs={}, priority='mid'):
-    payload = { 'args': args, 'kwargs': kwargs}
-    routing_key = priority_to_routing_key[priority]
+def a():
+    print(1)
+
+def send_as_task(connection, exchange, args=(), kwargs={}, routing_key=''):
+    payload = {'args': args, 'kwargs': kwargs}
     with producers[connection].acquire(block=True) as producer:
-        producer.publish(payload,
-                         serializer='pickle',
+        producer.publish(body=payload,
+                         serializer='json',
                          compression='bzip2',
-                         exchange=task_exchange,
-                         declare=[task_exchange],
-                         routing_key=routing_key)
+                         exchange=exchange,
+                         declare=[exchange],
+                         routing_key=routing_key,
+                         retry=True,
+                         retry_policy={
+                             'interval_start': 0,  # First retry immediately,
+                             'interval_step': 2,  # then increase by 2s for every retry.
+                             'interval_max': 30,  # but don't exceed 30s between retries.)
+                             'max_retries': 30,  # give up after 30 tries.
+                         },
 
-
-from kombu_example.producter.config import config_use as  use
-
-connection = Connection(host=use.Host, port=use.Port, virtual_host=use.VirtualHost, password=use.PassWord,
-                        userid=use.UserId)
+                         )

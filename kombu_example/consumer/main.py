@@ -1,9 +1,14 @@
 # -*- coding: utf8 -*-
-from kombu_example.consumer.consumer import connection,Worker
+
+
 if __name__ == '__main__':
-    with connection as conn:
-        try:
-            worker = Worker(conn)
-            worker.run()
-        except KeyboardInterrupt:
-            print('bye bye')
+
+    from kombu_example.consumer.consumer import KombuRoutes
+
+    KR = KombuRoutes()
+    @KR.route(exchange_name="44", queue_name="Elizabeth", routing_key="high")
+    def print_info(body, message):
+        print('Elizabeth says: "{0}"'.format(body))
+        message.ack()
+    # import time
+    # time.sleep(30)
