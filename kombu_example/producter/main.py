@@ -1,5 +1,4 @@
 # -*- coding: utf8 -*-
-from kombu import Connection
 from kombu_example.producter.sender import Producer
 from kombu_example.producter.config import config_use
 

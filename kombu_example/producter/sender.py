@@ -12,10 +12,12 @@ class Producer(object):
     def send_as_task(self, exchange_name='', args=(), kwargs={}, routing_key=''):
         exchange = Exchange(name=exchange_name, type='topic', durable=True, auto_delete=False)
         payload = {'args': args, 'kwargs': kwargs}
+        #多线程启动,方便发任务
         t = Thread(target=self._start_worker_thread, args=[payload, exchange, routing_key])
         t.start()
 
     def _start_worker_thread(self, payload, exchange, routing_key, ):
+        #使用了producers连接池
         with producers[self.connection].acquire(block=True) as producer:
             producer.publish(body=payload,
                              serializer='json',

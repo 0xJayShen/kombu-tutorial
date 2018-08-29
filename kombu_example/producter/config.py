@@ -10,16 +10,13 @@ class BaseConfig(object):
                                 userid=cls.UserId)
         return connection
 
+
 class Develope(BaseConfig):
     Host = 'localhost'
     Port = 5672
     VirtualHost = 'test'
     PassWord = 'guest'
     UserId = 'guest'
-
-
-
-
 
 
 config_dict = {"develop": Develope}
