@@ -9,9 +9,11 @@ connections = pools.Connections(limit=100)
 LOG = logging.getLogger(__name__)
 
 
-class KombuRoutes:
+class ConsumerRoutes:
+    def __init__(self,connection):
+        self.connection = connection
 
-    def route(self,*args,  **kwargs):
+    def route(self,  **kwargs):
         def func_wrapper(func):
             self._route(callback=func, **kwargs)
             return func
@@ -25,15 +27,12 @@ class KombuRoutes:
 
         # 线程启动任务
         t = Thread(target=self._start_worker_thread, args=[queue, callback])
-        print(t)
         t.start()
 
     def _start_worker_thread(self,  queue, callback):
-        from kombu_example.consumer.config import config_use
-        connection = config_use.get_connection()
-        with connections[connection].acquire(block=True) as conn:
+
+        with connections[self.connection].acquire(block=True) as conn:
             worker = Worker(conn, queue, callback)
-            print(queue)
             worker.run()
 
 

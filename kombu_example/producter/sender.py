@@ -1,20 +1,14 @@
 # -*- coding: utf8 -*-
+from kombu import Exchange
 from kombu.pools import producers
+from kombu_example.producter.config import config_use
 
 
-priority_to_routing_key = {
-    'high': 'hipri',
-    'mid': 'midpri',
-    'low': 'lopri',
-}
 
-
-def a():
-    print(1)
-
-def send_as_task(connection, exchange, args=(), kwargs={}, routing_key=''):
+def send_as_task( exchange_name, args=(), kwargs={}, routing_key=''):
+    exchange = Exchange(name=exchange_name, type='topic', durable=True, auto_delete=False)
     payload = {'args': args, 'kwargs': kwargs}
-    with producers[connection].acquire(block=True) as producer:
+    with producers[config_use.get_connection()].acquire(block=True) as producer:
         producer.publish(body=payload,
                          serializer='json',
                          compression='bzip2',
@@ -28,5 +22,4 @@ def send_as_task(connection, exchange, args=(), kwargs={}, routing_key=''):
                              'interval_max': 30,  # but don't exceed 30s between retries.)
                              'max_retries': 30,  # give up after 30 tries.
                          },
-
                          )
