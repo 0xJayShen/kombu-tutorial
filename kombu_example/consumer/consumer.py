@@ -1,4 +1,3 @@
-import logging
 from threading import Thread
 
 from kombu import Exchange, Queue
@@ -6,7 +5,6 @@ from kombu import pools
 from kombu.mixins import ConsumerMixin
 
 connections = pools.Connections(limit=100)
-LOG = logging.getLogger(__name__)
 
 
 class ConsumerRoutes:
