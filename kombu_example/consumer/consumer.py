@@ -1,19 +1,26 @@
 from threading import Thread
-
+import threading
 from kombu import Exchange, Queue
 from kombu import pools
 from kombu.mixins import ConsumerMixin
+import multiprocessing
+import os
 
 connections = pools.Connections(limit=100)
 
 
 class ConsumerRoutes:
-    def __init__(self, connection):
+    def __init__(self, connection,thread_num):
         self.connection = connection
+        self.thread_num = thread_num
 
     def route(self, **kwargs):
+
         def func_wrapper(func):
-            self._route(callback=func, **kwargs)
+            p = multiprocessing.Process(target=self._route, kwargs= {**kwargs,"callback":func} )  # 子进程的info()
+            p.start()
+
+            # self._route(callback=func, **kwargs)
             return func
 
         return func_wrapper
@@ -24,9 +31,13 @@ class ConsumerRoutes:
         queue = Queue(queue_name, exchange, routing_key=routing_key, durable=True, auto_delete=False)
 
         # 线程启动任务
-        t = Thread(target=self._start_worker_thread, args=[queue, callback])
-        t.start()
-
+        t_objs = []
+        for i in range(self.thread_num):
+            t = Thread(target=self._start_worker_thread, args=[queue, callback],daemon=False)
+            t.start()
+            t_objs.append(t)
+        for i in t_objs:
+            i.join()
     def _start_worker_thread(self, queue, callback):
         with connections[self.connection].acquire(block=True) as conn:
             worker = Worker(conn, queue, callback)
