@@ -26,14 +26,14 @@ class ConsumerRoutes:
 
         # 线程启动任务
         # self._start_worker_thread(queue, callback)
-        t = Thread(target=self._start_worker_thread, args=[queue, callback])
-        print(t)
-        t.start()
-        t.join()
-        # t_objs = []
-        # for i in range(self.thread_num):
-        #     t = Thread(target=self._start_worker_thread, args=[queue, callback], daemon=False)
-        #     t.start()
+        # t = Thread(target=self._start_worker_thread, args=[queue, callback])
+        # print(t)
+        # t.start()
+        # t.join()
+        t_objs = []
+        for i in range(self.thread_num):
+            t = Thread(target=self._start_worker_thread, args=[queue, callback], daemon=False)
+            t.start()
         #     t_objs.append(t)
         # for i in t_objs:
         #     i.join()
