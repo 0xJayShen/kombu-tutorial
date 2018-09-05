@@ -6,7 +6,6 @@ import threading
 from kombu_example.consumer.config import config_use
 from kombu_example.consumer.consumer import ConsumerRoutes
 
-A = ConsumerRoutes(config_use.get_connection(), 2)
 KR = ConsumerRoutes(config_use.get_connection(), 2)
 
 if __name__ == '__main__':
@@ -17,7 +16,7 @@ if __name__ == '__main__':
         message.ack()
 
 
-    @A.route(exchange_name="BExchange", queue_name="BQueue", routing_key="b")
+    @KR.route(exchange_name="BExchange", queue_name="BQueue", routing_key="b")
     def print_info(body, message):
         print("B线程", threading.currentThread().ident)
         print('B进程', os.getpid(), os.getppid())
