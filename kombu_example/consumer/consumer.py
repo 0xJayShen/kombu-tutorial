@@ -25,18 +25,10 @@ class ConsumerRoutes:
         queue = Queue(queue_name, exchange, routing_key=routing_key, durable=True, auto_delete=False)
 
         # 线程启动任务
-        # self._start_worker_thread(queue, callback)
-        # t = Thread(target=self._start_worker_thread, args=[queue, callback])
-        # print(t)
-        # t.start()
-        # t.join()
-        t_objs = []
         for i in range(self.thread_num):
             t = Thread(target=self._start_worker_thread, args=[queue, callback], daemon=False)
             t.start()
-        #     t_objs.append(t)
-        # for i in t_objs:
-        #     i.join()
+
 
     def _start_worker_thread(self, queue, callback):
         with connections[self.connection].acquire(block=True) as conn:
