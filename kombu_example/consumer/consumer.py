@@ -11,9 +11,9 @@ class ConsumerRoutes:
     def __init__(self, connection, thread_num):
         self.connection = connection
         self.thread_num = thread_num
+
     def route(self, **kwargs):
         def func_wrapper(func):
-
             self._route(callback=func, **kwargs)
             return func
 
@@ -28,7 +28,6 @@ class ConsumerRoutes:
         for i in range(self.thread_num):
             t = Thread(target=self._start_worker_thread, args=[queue, callback], daemon=False)
             t.start()
-
 
     def _start_worker_thread(self, queue, callback):
         with connections[self.connection].acquire(block=True) as conn:

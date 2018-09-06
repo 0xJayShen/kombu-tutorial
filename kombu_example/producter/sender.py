@@ -9,9 +9,9 @@ class Producer(object):
     def __init__(self, connection):
         self.connection = connection
 
-    def send_as_task(self, exchange_name='', args=(), kwargs={}, routing_key=''):
+    def send_as_task(self, exchange_name='', payload={}, routing_key=''):
         exchange = Exchange(name=exchange_name, type='topic', durable=True, auto_delete=False)
-        payload = {'args': args, 'kwargs': kwargs}
+        payload = payload
         #多线程启动,方便发任务
         t = Thread(target=self._start_worker_thread, args=[payload, exchange, routing_key])
         t.start()
